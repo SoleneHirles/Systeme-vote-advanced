@@ -1,0 +1,44 @@
+.entete{
+    height: 80px;
+}
+
+.gras{
+    font-weight: bolder;
+}
+.inline{
+    display: inline;
+}
+
+.liste{
+    margin: 0;
+    padding: 0.5%;
+}
+
+.padding1{
+    padding: 1%;
+}
+
+.taille25{
+    width: 25%;
+}
+
+.tabSpace{
+    border-collapse: separate;
+    border-spacing: 1vh 1vh;
+}
+
+.displayTRow{
+    display: table-row!important;
+}
+
+.taille50{
+    width: 50%;
+}
+
+.margeAuto{
+    margin: auto;
+}
+
+.taille75{
+    width: 75%;
+}

@@ -1,0 +1,252 @@
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <link rel="stylesheet" href="../w3.css"> 
+        <link href="packages/bootstrap-5.0.0-beta1-dist/css/bootstrap.css"  rel="stylesheet"/>
+            <link href="dist/css/tabulator.min.css" rel="stylesheet">
+            <link href="dist/css/bootstrap/tabulator_bootstrap.min.css" rel="stylesheet">
+        <script type="text/javascript" src="dist/js/tabulator.min.js"></script>
+
+        <!-- <style>
+            #montableau td {background-color:blue}
+            #montableau tr {background-color:blue}
+            #montableau table {width:100%;}
+            #montableau button {background-color: palegreen;}
+        </style> -->
+
+
+        <script type="text/javascript">
+            
+            function creeCle(code,version){
+                var js={'clinicien':code};
+                js['versionMP']=version;
+                js['version']='expert';
+                js['versionMP']=version;
+                return js                
+            }
+
+            function sendemail(em,js){
+                var subject="Installation MindPulse";
+                var txt="Bonjour,\n";
+                txt+="Veuillez trouver ci joint votre fichier d'activation";
+
+                var attachmt=js;
+
+                // call php
+
+                //XMLHttpRequest();
+            }
+
+
+        </script>
+
+
+    </head>
+    <body>
+
+        <div class="w3-container w3-indigo">
+            <h1> Editeur de clés d'activation</h1>
+            <h2> MindPulse</h2>
+        </div>
+
+        <br />
+        <br />
+        <div class="w3-tag w3-green">
+            Tableau
+        </div>
+        <br />
+
+        <div>
+            <button id="download-csv" class="w3-btn-small w3-blue w3-round-medium">Download CSV</button>
+            <button id="download-json" class="w3-btn-small w3-blue w3-round-medium">Download JSON</button>
+            <button id="download-xlsx" class="w3-btn-small w3-blue w3-round-medium">Download XLSX</button>
+        </div>
+        <br />
+
+        <div id="montableau" class="w3-table w3-striped"></div>
+        <script type="text/javascript">
+
+            var tabledata = [
+                {id:1, nom:"Alice",prenom:"Bob", 
+                    email:"Alice.Bob@cmail.com", 
+                    code:"Alice.Bob@cmail.com", 
+                    status:false,col:"",
+                    version:"MPv1",
+                    keycreated:false,
+                    emailsent:false,
+                    usable:true
+                },
+                {id:2, nom:"nouveau nom",prenom:"", email:"",code:"",
+                status:false,col:"",
+                    version:"MPv1",
+                    keycreated:false,
+                    emailsent:false,
+                    usable:false}
+            ]
+    
+            var table = new Tabulator("#montableau", {data:tabledata,autoColumns:true});
+    
+
+
+            var BtncCree = function(cell, formatterParams, onRendered){ 
+                //plain text value    
+                return '<button class="w3-btn w3-indigo w3-round-medium">Crée clé</button>';
+            };
+
+            var BtncCreeSelec = function(cell, formatterParams, onRendered){ 
+                //plain text value    
+                return '<button class="w3-btn w3-indigo w3-round-medium">Crée clé</button>';
+            };
+            function onclickcreecle(e,cell){
+                var r=cell.getRow();
+                var cd=r.getCell("code").getValue();
+                var em=r.getCell("email").getValue();
+                if (cd==""){alert("code non donné");return}
+                var vs=r.getCell("version").getValue();
+                alert(cd+" : "+vs);
+            }
+
+            var BtncEnvoi = function(cell, formatterParams, onRendered){ 
+                return '<button class="w3-btn w3-green w3-round-medium">Envoi mail</button>';
+            };
+            var BtncEnvoiSelec = function(cell, formatterParams, onRendered){ 
+                return '<button class="w3-btn w3-green w3-round-medium">Envoi mail</button>';
+            };
+            var BtncVoirMail = function(cell, formatterParams, onRendered){ 
+                return '<button class="w3-btn w3-yellow w3-round-medium">Voir mail</button>';
+            };
+            var BtnVersion = function(cell, formatterParams, onRendered){ 
+                return '<select class="w3-select-small"><option>v1</option><option>v2</option></select>';
+            };
+
+            var validatecode=function(cell,value,parameters){
+                if (value==""){return true};
+                var r=cell.getRow();
+                r.update({"code":value});
+                
+                if (r.getCell("email").getValue()==""){
+                    r.update({"email":value});
+
+                    var n=table.data().length;
+                    table.addRow({id:n, nom:"nouveau nom",prenom:"", email:"",code:"",
+                status:false,col:"",
+                    version:"MPv1",
+                    keycreated:false,
+                    emailsent:false,
+                    usable:false}
+                    );    
+                };
+                return true;
+
+            };
+
+            var newRow = function(cell,value,parameters){}
+            
+
+            var wd=window.innerWidth;
+            // alert(wd)
+
+            var mycolumns=[];
+            mycolumns.push(
+                {formatter:"rowSelection", titleFormatter:"rowSelection", hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+                    cell.getRow().toggleSelect();}});
+            // mycolumns.push(
+            //     {title:"Nom", field:"nom",editor:"input"});
+            // mycolumns.push(
+            //     {title:"Prénom",field:"prenom",editor:true});
+            mycolumns.push(
+                {title:"Email",field:"email",editor:true});
+                mycolumns.push(
+                {title:"Code",field:"code",editor:true,validator:[{type:validatecode,parameters:{}}]});
+            mycolumns.push(
+                {title:"Version",field:"version",editor:false,
+                formatter:BtnVersion,titleFormatter:BtnVersion});
+            mycolumns.push(
+                {title:"Crée clé", field:"creecle" ,
+                    headerSort:false ,titleFormatter:BtncCreeSelec,
+                    formatter:BtncCree,cellClick:onclickcreecle});
+            mycolumns.push(
+                {title:"Voir Mail", field:"voirmail" ,
+                    formatter:BtncVoirMail,
+                    headerSort:false ,cellClick:function(e, cell){alert("cell clicked - " + cell.getValue())}});
+            mycolumns.push(
+                {title:"Envoie Mail", field:"envoimail" ,
+                    formatter:BtncEnvoi,titleFormatter:BtncEnvoiSelec,
+                headerSort:false ,cellClick:function(e, cell){alert("cell clicked - " + cell.getValue())}});
+            mycolumns.push(
+                {title:"Status"});
+            mycolumns.push(
+                {title:"Log"});
+            mycolumns.push(
+                {title:"created",field:"created",visible:false});
+
+                // mycolumns=[
+            //     {formatter:"rowSelection", titleFormatter:"rowSelection", hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+            //         cell.getRow().toggleSelect();}},
+            //     {title:"Nom", field:"nom",editor:"input"},
+            //     {title:"Prénom",field:"prenom",editor:true},
+            //     {title:"Email",field:"email",editor:true},
+            //     {title:"Version",field:"version",editor:false,
+            //     formatter:BtnVersion,titleFormatter:BtnVersion},
+            //     {title:"Crée clé", field:"creecle" ,
+            //         headerSort:false ,titleFormatter:BtncCreeSelec,
+            //         formatter:BtncCree,cellClick:function(e, cell){alert("cell clicked - " + cell.getValue())}},
+            //     {title:"Voir Mail", field:"voirmail" ,
+            //         formatter:BtncVoirMail,
+            //         headerSort:false ,cellClick:function(e, cell){alert("cell clicked - " + cell.getValue())}},
+            //     {title:"Envoie Mail", field:"envoimail" ,
+            //         formatter:BtncEnvoi,titleFormatter:BtncEnvoiSelec,
+            //     headerSort:false ,cellClick:function(e, cell){alert("cell clicked - " + cell.getValue())}},
+            //     {title:"Status"},
+            //     {title:"Log"},
+            //     {title:"created",field:"created",visible:false}
+            // ]
+
+            var table = new Tabulator("#montableau", 
+            {data:tabledata,
+            columns:mycolumns,
+            layout:"fitDataStretch",
+            });
+        </script>
+
+    <div class="w3-bar w3-pale-blue">
+        <div class="w3-tag w3-green">Version :</div> 
+        <!-- <input class="w3-input-small" name="version" list="v1"></input> -->
+        <select class="w3-select-small">
+            <option value="v1">v1</option>
+            <option value="v2">v2</option>
+        </select>
+    </div>
+    <br>
+
+        <div class="w3-bar w3-pale-blue">
+            <div class="w3-tag w3-green">Nouveau clinicien</div>
+            <form>
+                <table class="w3-table w3-striped">
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <input type="text" name="nom" />
+                        </td>
+                        <td>
+                            <input type="text" name="prenom" />
+                        </td>
+                        <td>
+                            <input type="email" name="email" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+    </div>
+        
+    
+        <div class="w3-panel w3-blue-gray">...</div>
+
+    
+    </body>
+</html>
